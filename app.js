@@ -3,8 +3,6 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 app.use(function(req, res, next){
-  res.setHeader('Access-Control-Allow-Origin', 'http://www.ycmjason.com');
-  res.setHeader('Access-Control-Allow-Origin', 'http://www.doc.ic.ac.uk');
   next();
 });
 
