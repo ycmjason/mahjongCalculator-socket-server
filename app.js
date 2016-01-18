@@ -4,6 +4,7 @@ var io = require('socket.io')(http);
 var port = process.env.PORT || 3000;
 
 app.use(function(req, res, next){
+  res.setHeader('Access-Control-Allow-Origin', 'http://www.ycmjason.com');
   res.setHeader('Access-Control-Allow-Origin', 'http://www.doc.ic.ac.uk');
 
   // Request methods you wish to allow
