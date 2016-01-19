@@ -32,10 +32,11 @@ exports.onConnection = function(socket){
     game.emit('update game userNumber', game.getNumberOfSockets());
   });
   socket.on('disconnect', function(){
-    gameTable.socketDisconnect(socket);
     var game = gameTable.findGameBySocket(socket);
+    console.log(socket.id+' disconnected.');
     if(game){
       game.emit('update game userNumber', game.getNumberOfSockets());
     }
+    gameTable.socketDisconnect(socket);
   });
 };
