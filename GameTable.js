@@ -2,20 +2,19 @@ var _ = require('underscore');
 
 var Game = function(code, mjData){
   var sockets = [];
-  var updateSockets = function(){
-    sockets.forEach(function(socket){
-      socket.emit('update mjData', mjData);
-    });
-  };
   this.getCode = function(){
     return code;
   };
   this.getMjData = function(){
     return mjData;
   };
-  this.setMjDataAndUpdateSockets = function(json){
+  this.emit = function(event, data){
+    sockets.forEach(function(socket){
+      socket.emit(event, data);
+    });
+  };
+  this.setMjData = function(json){
     mjData = json;
-    updateSockets();
   };
   this.addSocket = function(socket){
     if(!this.containsSocket(socket))

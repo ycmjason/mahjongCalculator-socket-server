@@ -11,11 +11,13 @@ exports.onConnection = function(socket){
     var game = gameTable.addGame(mjData);
     game.addSocket(socket);
     socket.emit('update game code', game.getCode());
+    socket.emit('update game userNumber', game.getNumberOfSockets());
   });
 
   socket.on('update game', function(g){
     var game = gameTable.findGameByCode(g.code);
-    game.setMjDataAndUpdateSockets(g.mjData);
+    game.setMjData(g.mjData);
+    game.emit(g.mjData);
   });
 
   socket.on('join game', function(code){
@@ -27,10 +29,13 @@ exports.onConnection = function(socket){
     }
     game.addSocket(socket);
     socket.emit('update mjData', game.getMjData());
+    game.emit('update game userNumber', game.getNumberOfSockets());
   });
   socket.on('disconnect', function(){
-    console.log(socket.id+' disconnected.');
     gameTable.socketDisconnect(socket);
-    console.log(gameTable.getGames().map(game=>game.getNumberOfSockets()));
+    var game = gameTable.findGameBySocket(socket);
+    if(game){
+      game.emit('update game userNumber', game.getNumberOfSockets());
+    }
   });
 };
