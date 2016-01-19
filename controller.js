@@ -32,9 +32,6 @@ exports.onConnection = function(socket){
     game.emit('update game userNumber', game.getNumberOfSockets());
   });
 
-  socket.on('reconnect', function(){
-    console.log('A client, '+socket.id+' reconnected.');
-  });
   socket.on('disconnect', function(){
     var game = gameTable.findGameBySocket(socket);
     gameTable.socketDisconnect(socket);
