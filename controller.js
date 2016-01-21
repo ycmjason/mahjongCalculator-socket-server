@@ -1,9 +1,12 @@
 var GameTable = require('./GameTable.js');
 
 var gameTable = new GameTable();
+var addressClient = function(socket){
+  return 'A client, '+socket.id+',';
+}
 
 exports.onConnection = function(socket){
-  console.log('A client, '+socket.id+', has connected!');
+  console.log(addressClient(socket)+' has connected!');
 
   socket.on('new game', function(mjData){
     console.log('A client, '+socket.id+' created a new game.');
@@ -15,6 +18,8 @@ exports.onConnection = function(socket){
   });
 
   socket.on('update game', function(g){
+    console.log(addressClient(socket)+' updated.');
+
     var game = gameTable.findGameByCode(g.code);
     game.setMjData(g.mjData);
     game.emit('update mjData', g.mjData);
@@ -26,16 +31,19 @@ exports.onConnection = function(socket){
       var msg = 'The code you provided is not found.';
       return socket.emit('[fail] join game', msg);
     }
-    console.log('A client, '+socket.id+' joined '+code+'.');
+
+    console.log(addressClient(socket)+' joined '+code+'.');
+
     game.addSocket(socket);
     socket.emit('update mjData', game.getMjData());
     game.emit('update game userNumber', game.getNumberOfSockets());
   });
 
   socket.on('disconnect', function(){
+    console.log(addressClient(socket)+' is disconnected.');
+
     var game = gameTable.findGameBySocket(socket);
     gameTable.socketDisconnect(socket);
-    console.log('A client, '+socket.id+' disconnected.');
     if(game != undefined){
       game.emit('update game userNumber', game.getNumberOfSockets());
     }
