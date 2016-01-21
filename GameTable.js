@@ -66,7 +66,9 @@ var GameTable = module.exports = function(){
   }
   this.socketDisconnect = function(socket){
     games.forEach(function(game){
-      game.removeSocket(socket);
+      setTimeout(function(){
+        game.removeSocket(socket);
+      }, 10*1000/*24*60*60*1000*/);
     });
     games=games.filter(game=>game.getNumberOfSockets()>0);
   }

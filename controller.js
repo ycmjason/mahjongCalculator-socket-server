@@ -9,9 +9,9 @@ exports.onConnection = function(socket){
   console.log(addressClient(socket)+' has connected!');
 
   socket.on('new game', function(mjData){
-    console.log('A client, '+socket.id+' created a new game.');
 
     var game = gameTable.addGame(mjData);
+    console.log('A client, '+socket.id+' created '+game.getCode()+'.');
     game.addSocket(socket);
     socket.emit('update game code', game.getCode());
     socket.emit('update game userNumber', game.getNumberOfSockets());
@@ -37,6 +37,10 @@ exports.onConnection = function(socket){
     game.addSocket(socket);
     socket.emit('update mjData', game.getMjData());
     game.emit('update game userNumber', game.getNumberOfSockets());
+  });
+
+  socket.on('reconnect', function(mjData){
+    connect(addressClient(socket)+' reconnected.');
   });
 
   socket.on('disconnect', function(){
