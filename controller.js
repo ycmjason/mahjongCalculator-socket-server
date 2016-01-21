@@ -18,7 +18,7 @@ exports.onConnection = function(socket){
   });
 
   socket.on('update game', function(g){
-    console.log(addressClient(socket)+' updated.');
+    console.log(addressClient(socket)+' updated '+g.code+'.');
 
     var game = gameTable.findGameByCode(g.code);
     game.setMjData(g.mjData);
