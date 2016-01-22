@@ -98,7 +98,7 @@ var GameTable = module.exports = function(){
   this.getGames = () => games;
   this.getStat = function(){
     var stat = {};
-    stat.game = games.map(game=>({
+    stat.games = games.map(game=>({
       code: game.getCode(),
       sockets: game.getSockets().map(socket=>socket.id)
     }));
