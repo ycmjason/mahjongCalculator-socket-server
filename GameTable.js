@@ -39,6 +39,7 @@ var Game = function(code, mjData){
     return sockets.filter(s => s.id == socket.id).length > 0;
   };
   this.getNumberOfSockets = ()=>sockets.length;
+  this.getSockets = () => sockets;
 }
 
 var GameTable = module.exports = function(){
@@ -97,7 +98,10 @@ var GameTable = module.exports = function(){
   this.getGames = () => games;
   this.getStat = function(){
     var stat = {};
-    stat.gameCodes = games.map(game=>game.getCode());
+    stat.game = games.map(game=>({
+      code: game.getCode(),
+      sockets: game.getSockets().map(socket=>socket.id)
+    }));
     return stat;
   }
 };
