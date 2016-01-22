@@ -2,6 +2,7 @@ var _ = require('underscore');
 
 var Game = function(code, mjData){
   var sockets = [];
+  var expiryDay = 0;
   this.getCode = function(){
     return code;
   };
@@ -17,13 +18,23 @@ var Game = function(code, mjData){
     mjData = json;
   };
   this.addSocket = function(socket){
-    if(!this.containsSocket(socket))
+    if(!this.containsSocket(socket)){
       sockets.push(socket);
+      expiryDay = 0;
+    }
   };
   this.removeSocket = function(socket){
     sockets = sockets.filter(s => s.id != socket.id);
+    if(sockets.length <= 0){
+      expiryDay = Date.now() + 24*60*60*1000;
+    }
     return sockets.length;
   };
+
+  this.isExpired = function(){
+    return expiryDay && Date.now() >= expiryDay;
+  }
+
   this.containsSocket = function(socket){
     return sockets.filter(s => s.id == socket.id).length > 0;
   };
@@ -32,6 +43,16 @@ var Game = function(code, mjData){
 
 var GameTable = module.exports = function(){
   var games = [];
+  var removeEmptyGames = function(){
+    var expiredGames = games.filter(game=>game.isExpired());
+    if(expiredGames.length > 0){
+      console.log('GameTable REMOVING ['+expiredGames.map(game=>game.getCode())+'].');
+      games = games.filter(game=>!game.isExpired());
+    }
+  }
+  // Start a thread which infinitly check for expired threads per minute
+  var emptyGameClearanceService = setInterval(removeEmptyGames, 60*1000);
+
   var generateCode = function(){
     // code is constructed by 4 char (lower case)
     // Therefore the max. number of games is 26^4 = 456976
@@ -65,13 +86,18 @@ var GameTable = module.exports = function(){
     return games.filter(game => game.containsSocket(socket))[0];
   }
   this.socketDisconnect = function(socket){
-    games.forEach(function(game){
-      setTimeout(function(){
-        game.removeSocket(socket);
-      }, 10*1000/*24*60*60*1000*/);
-    });
-    games=games.filter(game=>game.getNumberOfSockets()>0);
+    var gamesThatClientIn = games.filter(game => game.containsSocket(socket));
+
+    // removing socket will update the expiry day IF the game is empty,
+    // then empty games will be cleared by emptyGameClearanceService
+    // which is initialised at the start of this class
+    gamesThatClientIn.forEach(game => game.removeSocket(socket));
   }
   /* for testing purpose, should not be called */
   this.getGames = () => games;
+  this.getStat = function(){
+    var stat = {};
+    stat.gameCodes = games.map(game=>game.getCode());
+    return stat;
+  }
 };

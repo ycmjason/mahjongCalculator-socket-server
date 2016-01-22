@@ -6,12 +6,12 @@ var addressClient = function(socket){
 }
 
 exports.onConnection = function(socket){
-  console.log(addressClient(socket)+' has connected!');
+  console.log(addressClient(socket)+' connected!');
 
   socket.on('new game', function(mjData){
 
     var game = gameTable.addGame(mjData);
-    console.log('A client, '+socket.id+' created '+game.getCode()+'.');
+    console.log(addressClient(socket)+' created '+game.getCode()+'.');
     game.addSocket(socket);
     socket.emit('update game code', game.getCode());
     socket.emit('update game userNumber', game.getNumberOfSockets());
@@ -39,12 +39,8 @@ exports.onConnection = function(socket){
     game.emit('update game userNumber', game.getNumberOfSockets());
   });
 
-  socket.on('reconnect', function(mjData){
-    connect(addressClient(socket)+' reconnected.');
-  });
-
   socket.on('disconnect', function(){
-    console.log(addressClient(socket)+' is disconnected.');
+    console.log(addressClient(socket)+' disconnected.');
 
     var game = gameTable.findGameBySocket(socket);
     gameTable.socketDisconnect(socket);
@@ -53,3 +49,8 @@ exports.onConnection = function(socket){
     }
   });
 };
+
+exports.showStats = function(req, res){
+  var stat = gameTable.getStat();
+  res.send(stat);
+}
