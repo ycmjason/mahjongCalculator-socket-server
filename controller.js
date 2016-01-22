@@ -52,5 +52,5 @@ exports.onConnection = function(socket){
 
 exports.showStats = function(req, res){
   var stat = gameTable.getStat();
-  res.send(JSON.stringify(stat, null, 4));
+  res.send('<html><head></head><body><pre>'+JSON.stringify(stat, null, 4)+'</pre></body></html>');
 }
