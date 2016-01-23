@@ -38,13 +38,13 @@ var Game = function(code, mjData){
           }
 
           sockets.forEach(function(socket){
-            console.log('Emitted '+event+' to '+socket.id+'.');
+            //console.log('Emitted '+event+' to '+socket.id+'.');
             socket.emit(event, data);
           });
           savedWaiting = savedWaiting.filter((w)=>w.event!=event);
         }
         busy = false;
-      }, 1000);
+      }, 250);
     };
   }());
   this.setMjData = function(json){
