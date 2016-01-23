@@ -1,3 +1,4 @@
 node_modules
 .*.swp
 showherokulog
+.DS_Store
