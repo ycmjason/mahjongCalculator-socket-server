@@ -15,8 +15,9 @@ var Game = module.exports = function(code, mjData){
     var timeout;
 
     return function(event, data){
-      clearTimeout(timeout);
       waiting.push({event:event, data:data});
+      if(!busy){
+        clearTimeout(timeout);
         timeout = setTimeout(function(){
           if(busy || !waiting || waiting.length<=0) return;
           busy = true;
@@ -24,10 +25,9 @@ var Game = module.exports = function(code, mjData){
           do{
             // save the waiting list to avoid concurrent edit to waiting list
             var savedWaiting = waiting; 
-
             waiting = [];
 
-            while(savedWaiting.length>0){
+            while(savedWaiting.length>0){ // each loop deal with one event
               var event = savedWaiting[0].event; // deal with the latest event first
               var data = savedWaiting[0].data;
               if(_.isObject(data)){
@@ -44,8 +44,12 @@ var Game = module.exports = function(code, mjData){
               savedWaiting = savedWaiting.filter((w)=>w.event!=event);
             }
           }while(waiting.length>0);
+
           busy = false;
+
         }, 1000);
+
+      }
     };
   }());
   this.setMjData = function(json){
