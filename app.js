@@ -5,7 +5,11 @@ var controller = require('./controller.js');
 
 var port = process.env.PORT || 3000;
 
-app.get('/', controller.showStats);
+app.get('/', function(req, res){
+  res.sendFile(__dirname + '/index.html');
+});
+
+app.get('/stat', controller.showStats);
 
 io.on('connection', controller.onConnection);
 

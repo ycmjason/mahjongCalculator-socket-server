@@ -37,13 +37,13 @@ var Game = module.exports = function(code, mjData){
           }
 
           sockets.forEach(function(socket){
-            //console.log('Emitted '+event+' to '+socket.id+'.');
+            console.log('Emitted '+event+' to '+socket.id+'.');
             socket.emit(event, data);
           });
           savedWaiting = savedWaiting.filter((w)=>w.event!=event);
         }
         busy = false;
-      }, 250);
+      }, 1000);
     };
   }());
   this.setMjData = function(json){
