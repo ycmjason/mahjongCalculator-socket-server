@@ -17,33 +17,35 @@ var Game = module.exports = function(code, mjData){
     return function(event, data){
       clearTimeout(timeout);
       waiting.push({event:event, data:data});
-      timeout = setTimeout(function(){
-        if(busy || !waiting || waiting.length<=0) return;
-        busy = true;
+      do{
+        timeout = setTimeout(function(){
+          if(busy || !waiting || waiting.length<=0) return;
+          busy = true;
 
-        // save the waiting list to avoid concurrent edit to waiting list
-        var savedWaiting = waiting; 
+          // save the waiting list to avoid concurrent edit to waiting list
+          var savedWaiting = waiting; 
 
-        waiting = [];
+          waiting = [];
 
-        while(savedWaiting.length>0){
-          var event = savedWaiting[0].event; // deal with the latest event first
-          var data = savedWaiting[0].data;
-          if(_.isObject(data)){
-            // combine the final data with extend provided by underscore
-            // this will filter all data from savedWaiting list with 'event'
-            var datas = savedWaiting.filter((obj)=>obj.event==event).map((obj)=>obj.data);
-            data = datas.reduce((a,b)=>_.extend(a,b));
+          while(savedWaiting.length>0){
+            var event = savedWaiting[0].event; // deal with the latest event first
+            var data = savedWaiting[0].data;
+            if(_.isObject(data)){
+              // combine the final data with extend provided by underscore
+              // this will filter all data from savedWaiting list with 'event'
+              var datas = savedWaiting.filter((obj)=>obj.event==event).map((obj)=>obj.data);
+              data = datas.reduce((a,b)=>_.extend(a,b));
+            }
+
+            sockets.forEach(function(socket){
+              console.log('Emitted '+event+' to '+socket.id+'.');
+              socket.emit(event, data);
+            });
+            savedWaiting = savedWaiting.filter((w)=>w.event!=event);
           }
-
-          sockets.forEach(function(socket){
-            console.log('Emitted '+event+' to '+socket.id+'.');
-            socket.emit(event, data);
-          });
-          savedWaiting = savedWaiting.filter((w)=>w.event!=event);
-        }
-        busy = false;
-      }, 1000);
+          busy = false;
+        }, 1000);
+      }while(waiting.length>0);
     };
   }());
   this.setMjData = function(json){
