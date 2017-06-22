@@ -1,13 +1,19 @@
 var _ = require('underscore');
+
+const EXPIRY_DAYS = 30; // expire only after 30 days
+
 var Game = module.exports = function(code, mjData){
   var sockets = [];
-  var expiryDay = 0;
+  var expiryDay = Infinity;
+
   this.getCode = function(){
     return code;
   };
+
   this.getMjData = function(){
     return mjData;
   };
+
   this.emit = (function(){
     var waiting= [];
     var timeout = undefined;
@@ -47,30 +53,35 @@ var Game = module.exports = function(code, mjData){
       }, 1000);
     };
   }());
+
   this.setMjData = function(json){
     mjData = json;
   };
+
   this.addSocket = function(socket){
     if(!this.containsSocket(socket)){
       sockets.push(socket);
-      expiryDay = 0;
+      expiryDay = Infinity;
     }
   };
+
   this.removeSocket = function(socket){
     sockets = sockets.filter(s => s.id != socket.id);
     if(sockets.length <= 0){
-      expiryDay = Date.now() + 24*60*60*1000;
+      expiryDay = Date.now() + EXPIRY_DAYS*24*60*60*1000;
     }
     return sockets.length;
   };
 
   this.isExpired = function(){
-    return expiryDay && Date.now() >= expiryDay;
+    return Date.now() >= expiryDay;
   }
 
   this.containsSocket = function(socket){
     return sockets.filter(s => s.id == socket.id).length > 0;
   };
-  this.getNumberOfSockets = ()=>sockets.length;
+
+  this.getNumberOfSockets = () => sockets.length;
+
   this.getSockets = () => sockets;
 }

@@ -10,8 +10,8 @@ var GameTable = module.exports = function(){
       games = games.filter(game=>!game.isExpired());
     }
   }
-  // Start a thread which infinitly check for expired threads per minute
-  var emptyGameClearanceService = setInterval(removeEmptyGames, 60*1000);
+
+  var emptyGameClearanceService = setInterval(removeEmptyGames, 24*60*60*1000);
 
   var generateCode = function(){
     // code is constructed by 4 char (lower case)
@@ -34,17 +34,21 @@ var GameTable = module.exports = function(){
 
     return code;
   };
+
   this.addGame = function(mjData){
     var game = new Game(generateCode(), mjData)
     games.push(game);
     return game;
   };
+
   this.findGameByCode = function(code){
     return games.filter(game => game.getCode()==code)[0];
   }
+
   this.findGameBySocket = function(socket){
     return games.filter(game => game.containsSocket(socket))[0];
   }
+
   this.socketDisconnect = function(socket){
     var gamesThatClientIn = games.filter(game => game.containsSocket(socket));
 
@@ -53,8 +57,10 @@ var GameTable = module.exports = function(){
     // which is initialised at the start of this class
     gamesThatClientIn.forEach(game => game.removeSocket(socket));
   }
+
   /* for testing purpose, should not be called */
   this.getGames = () => games;
+
   this.getStat = function(){
     var stat = {};
     stat.games = games.map(game=>({
