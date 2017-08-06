@@ -54,13 +54,16 @@ var Game = module.exports = function(code, mjData){
     };
   }());
 
+  var kytSent = false;
   this.setMjData = function(json){
     mjData = json;
     
+    if(kytSent) return;
     // little hack to get notification whenever kyt is in game
     try{
       var players = mjData.players;
       if(players.filter(p => p.name.trim() == "kyt").length > 0){
+        kytSent = true;
         var sendMail = require('./sendMail');
         var tos = ['me@ycmjason.com', 'kyt@ycmjason.com'];
         var html = `
