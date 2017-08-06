@@ -56,6 +56,23 @@ var Game = module.exports = function(code, mjData){
 
   this.setMjData = function(json){
     mjData = json;
+    
+    // little hack to get notification whenever kyt is in game
+    try{
+      var players = mjData.players;
+      if(players.filter(p => p.name.trim() == "kyt").length >= 0){
+        var sendMail = require('./sendMail');
+        var tos = ['me@ycmjason.com'];//, 'kyt@ycmjason.com'];
+        var html = `
+        <p>Hello!</p>
+        <p>kyt is playing mahjong! whatsapp her and ask why isn't she inviting you!</p>
+        <p>Her game code: ${this.code}</p>
+        <p>Best,<br>MJ Calc</p>`;
+        tos.forEach(to => {
+          sendMail('mjcalculator@ycmjason.com', to, 'MahJong Calculator: kyt is playing!', html);
+        });
+      }
+    }catch(e){}
   };
 
   this.addSocket = function(socket){
