@@ -65,7 +65,9 @@ var GameTable = module.exports = function(){
     var stat = {};
     stat.games = games.map(game=>({
       code: game.getCode(),
-      sockets: game.getSockets().map(socket=>socket.id)
+      sockets: game.getSockets().map(socket=>socket.id),
+      players: game.getMjData().players.map(p => p.name),
+      created: game.created.toString(),
     }));
     return stat;
   }

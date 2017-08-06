@@ -5,6 +5,7 @@ const EXPIRY_DAYS = 30; // expire only after 30 days
 var Game = module.exports = function(code, mjData){
   var sockets = [];
   var expiryDay = Infinity;
+  this.created = new Date();
 
   this.getCode = function(){
     return code;
